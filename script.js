@@ -44,35 +44,147 @@ function closeModal(modalId) {
     document.body.style.overflow = 'auto';
 }
 
-// ===== QR POPUP =====
-function showQrPopup(color) {
+// ===== QR MODAL =====
+function showQRModal(color) {
     const title = color === 'blue' ? 'BLUE QR CODE' : 'YELLOW QR CODE';
     const qrSrc = color === 'blue' ? 'images/blue_qr.png' : 'images/yellow_qr.png';
     const upiId = color === 'blue' ? '7599181164@ybl' : '7599181164-2@ybl';
-    const upiLink = color === 'blue' 
-        ? 'upi://pay?pa=7599181164@ybl&pn=APEX%20DAY%20BLUE&cu=INR' 
-        : 'upi://pay?pa=7599181164-2@ybl&pn=APEX%20DAY%20YELLOW&cu=INR';
+    const buttonColor = color === 'blue' ? 'blue-3d' : 'yellow-3d';
+    const modalColor = color === 'blue' ? 'blue-modal' : 'yellow-modal';
+    const colorUpper = color === 'blue' ? 'BLUE' : 'YELLOW';
     
     document.getElementById('modalTitle').textContent = title;
+    
+    const modalContent = document.getElementById('modalContent');
+    modalContent.classList.remove('blue-modal', 'yellow-modal');
+    modalContent.classList.add(modalColor);
+    
     document.getElementById('modalBody').innerHTML = `
         <div style="text-align: center;">
-            <img src="${qrSrc}" alt="${color} QR" style="width: 200px; height: 200px; border-radius: 16px; margin-bottom: 16px; border: 2px solid #f0f0f0; padding: 10px; background: white;" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div style=\'width:200px;height:200px;background:linear-gradient(145deg,#f8f9fa,#e9ecef);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:16px;border:2px solid ${color === 'blue' ? '#4361ee' : '#ffd166'}\'><i class=\'fas fa-qrcode\' style=\'font-size:5rem;color:${color === 'blue' ? '#4361ee' : '#f8961e'};margin-bottom:10px;\'></i><span style=\'font-weight:700;color:${color === 'blue' ? '#4361ee' : '#f8961e'}\'>${color === 'blue' ? 'BLUE' : 'YELLOW'} QR</span></div>');">
-            <div style="background: #f8f9fa; padding: 14px; border-radius: 14px; margin: 16px 0;">
-                <p style="margin: 5px 0; font-size: 0.85rem;"><strong>UPI ID:</strong></p>
-                <p style="font-family: monospace; font-size: 0.85rem; background: white; padding: 10px; border-radius: 10px; border: 1px solid #eee;">${upiId}</p>
+            <!-- FULL SIZE QR -->
+            <div class="modal-qr-full">
+                <img src="${qrSrc}" alt="${color} QR" id="modalQRImage" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div style=\'width:100%;aspect-ratio:1/1;background:linear-gradient(145deg,#f8f9fa,#e9ecef);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid ${color === 'blue' ? '#4361ee' : '#ffd166'}\'><i class=\'fas fa-qrcode\' style=\'font-size:5rem;color:${color === 'blue' ? '#4361ee' : '#f8961e'};margin-bottom:10px;\'></i><span style=\'font-weight:700;color:${color === 'blue' ? '#4361ee' : '#f8961e'}\'>${color === 'blue' ? 'BLUE' : 'YELLOW'} QR</span></div>');">
             </div>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="copyUPI('${color}')" style="padding: 10px 16px; background: #4361ee; color: white; border: none; border-radius: 30px; cursor: pointer; font-size: 0.8rem;"><i class="far fa-copy"></i> Copy UPI</button>
-                <a href="${upiLink}" style="text-decoration: none;"><button style="padding: 10px 16px; background: #ffd166; color: #212529; border: none; border-radius: 30px; cursor: pointer; font-size: 0.8rem;"><span style="font-size: 0.9rem;">₹</span> Pay Now</button></a>
+            
+            <!-- UPI ID MINI BAR -->
+            <div class="upi-mini-bar">
+                <span><strong>UPI ID :</strong> ${upiId}</span>
+                <i class="far fa-copy" onclick="copyUPI('${color}')" style="cursor: pointer;"></i>
+            </div>
+            
+            <!-- SINGLE BIG 3D BUTTON -->
+            <button class="payment-3d-btn ${buttonColor}" onclick="startPaymentCountdown('${color}', this)">
+                <i class="fas fa-bolt"></i>
+                <div style="display: flex; flex-direction: column;">
+                    <span class="btn-text-line1">PAY NOW</span>
+                    <span class="btn-text-line2">Quick • Secure</span>
+                </div>
+                <span class="btn-countdown" id="countdownDisplay">5s</span>
+            </button>
+            
+            <!-- STEP BY STEP INSTRUCTIONS -->
+            <div class="step-instructions">
+                <h4><i class="fas fa-info-circle"></i> How to Pay:</h4>
+                
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-text">
+                        <strong>Copy UPI ID</strong> from above
+                        <div class="step-optional">(optional)</div>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-text">
+                        Click <strong>PAY NOW</strong> button
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-text">
+                        Wait <strong>5 seconds</strong> for auto-redirect
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-text">
+                        Choose your UPI app (if multiple)
+                    </div>
+                </div>
+                
+                <div class="step-note">
+                    <i class="fas fa-pen"></i>
+                    <strong>Note:</strong> Add <span style="color: ${color === 'blue' ? '#4361ee' : '#f8961e'}; font-weight: 700;">${colorUpper}</span> in payment note
+                </div>
             </div>
         </div>
     `;
+    
     openModal('qrModal');
+}
+
+// ===== COUNTDOWN WITH DIRECT UPI =====
+let countdownInterval;
+
+function startPaymentCountdown(color, buttonElement) {
+    // Stop previous countdown if running
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+    
+    let seconds = 5;
+    const countdownDisplay = document.getElementById('countdownDisplay');
+    
+    // UPI link - DEFAULT UPI APP will open (Android will show chooser if multiple)
+    const upiLink = color === 'blue' 
+        ? 'upi://pay?pa=7599181164@ybl&pn=APEX%20DAY%20BLUE&cu=INR&am=10' 
+        : 'upi://pay?pa=7599181164-2@ybl&pn=APEX%20DAY%20YELLOW&cu=INR&am=10';
+    
+    // Disable button during countdown
+    buttonElement.style.pointerEvents = 'none';
+    buttonElement.style.opacity = '0.8';
+    
+    countdownInterval = setInterval(() => {
+        seconds--;
+        
+        if (countdownDisplay) {
+            countdownDisplay.textContent = seconds + 's';
+        }
+        
+        // Button press effect every second
+        buttonElement.style.transform = 'translateY(4px)';
+        buttonElement.style.boxShadow = '0 4px 0 rgba(0,0,0,0.2), 0 8px 15px rgba(0,0,0,0.1)';
+        
+        setTimeout(() => {
+            buttonElement.style.transform = '';
+            buttonElement.style.boxShadow = '';
+        }, 100);
+        
+        if (seconds <= 0) {
+            clearInterval(countdownInterval);
+            
+            // Re-enable button
+            buttonElement.style.pointerEvents = 'auto';
+            buttonElement.style.opacity = '1';
+            
+            // Direct UPI app open - DEFAULT APP will open
+            // If multiple UPI apps, Android will show chooser dialog
+            window.location.href = upiLink;
+            showToast('Opening UPI app...');
+        }
+    }, 1000);
 }
 
 // ===== FULL SCREEN POSTER =====
 function openFullScreen(img) {
     document.getElementById('modalTitle').textContent = 'APEX DAY';
+    
+    const modalContent = document.getElementById('modalContent');
+    modalContent.classList.remove('blue-modal', 'yellow-modal');
+    
     document.getElementById('modalBody').innerHTML = `<div style="text-align: center;"><img src="${img.src}" alt="Poster" style="width: 100%; border-radius: 12px; border: 2px solid #f0f0f0;"></div>`;
     openModal('qrModal');
 }
@@ -80,31 +192,36 @@ function openFullScreen(img) {
 // ===== COPY UPI =====
 function copyUPI(color) {
     const upiId = color === 'blue' ? '7599181164@ybl' : '7599181164-2@ybl';
-    navigator.clipboard.writeText(upiId).then(() => showToast('UPI ID copied!')).catch(() => showToast('Failed to copy', 'error'));
+    navigator.clipboard.writeText(upiId).then(() => {
+        showToast('UPI ID copied!');
+    }).catch(() => {
+        showToast('Failed to copy', 'error');
+    });
 }
 
 // ===== SOCIAL MEDIA =====
-function openTelegram() { window.open('https://t.me/apexday', '_blank'); }
-function openWhatsApp() { window.open('https://chat.whatsapp.com/D73ihC5eDL44OkCqpXLdoH?mode=gi_t', '_blank'); }
+function openTelegram() { 
+    window.open('https://t.me/apexday', '_blank'); 
+}
+
+function openWhatsApp() { 
+    window.open('https://chat.whatsapp.com/D73ihC5eDL44OkCqpXLdoH?mode=gi_t', '_blank'); 
+}
 
 // ===== TOAST =====
 function showToast(message, type = 'success') {
     const toast = document.getElementById('toast');
     const icon = toast.querySelector('i');
     const messageEl = document.getElementById('toastMessage');
+    
     messageEl.textContent = message;
     icon.className = type === 'error' ? 'fas fa-times-circle' : 'fas fa-check-circle';
     toast.style.background = type === 'error' ? '#f72585' : '#4cc9f0';
     toast.style.display = 'flex';
-    setTimeout(() => { toast.style.display = 'none'; }, 2500);
-}
-
-// ===== QR CLICK HANDLER =====
-function handleQRClick(color, element) {
-    if (element && element.style.display !== 'none') {
-        const payLink = document.getElementById(color === 'blue' ? 'bluePayLink' : 'yellowPayLink');
-        if (payLink) window.location.href = payLink.href;
-    }
+    
+    setTimeout(() => { 
+        toast.style.display = 'none'; 
+    }, 2500);
 }
 
 // ===== INITIALIZATION =====
@@ -112,54 +229,26 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDate();
     startCountdown();
     setInterval(startCountdown, 1000);
-    
-    const blueQR = document.getElementById('blueQRImage');
-    const yellowQR = document.getElementById('yellowQRImage');
-    const bluePayLink = document.getElementById('bluePayLink');
-    const yellowPayLink = document.getElementById('yellowPayLink');
-    
-    // BLUE QR CLICK
-    if (blueQR) {
-        blueQR.addEventListener('click', function(e) {
-            if (blueQR.style.display !== 'none' && bluePayLink) {
-                window.location.href = bluePayLink.href;
-            }
-        });
-    }
-    
-    // YELLOW QR CLICK
-    if (yellowQR) {
-        yellowQR.addEventListener('click', function(e) {
-            if (yellowQR.style.display !== 'none' && yellowPayLink) {
-                window.location.href = yellowPayLink.href;
-            }
-        });
-    }
-    
-    // PLACEHOLDER CLICK HANDLER
-    setTimeout(function() {
-        // BLUE PLACEHOLDER
-        document.querySelectorAll('.blue-box .qr-placeholder').forEach(function(el) {
-            el.addEventListener('click', function() { 
-                showQrPopup('blue'); 
-            });
-        });
-        
-        // YELLOW PLACEHOLDER
-        document.querySelectorAll('.yellow-box .qr-placeholder').forEach(function(el) {
-            el.addEventListener('click', function() { 
-                showQrPopup('yellow'); 
-            });
-        });
-    }, 500);
 });
 
 // ===== MODAL CLOSE HANDLERS =====
 window.onclick = function(event) {
     const qrModal = document.getElementById('qrModal');
-    if (event.target === qrModal) closeModal('qrModal');
+    
+    if (event.target === qrModal) {
+        closeModal('qrModal');
+        // Clear countdown if running
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+        }
+    }
 };
 
 document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') closeModal('qrModal');
+    if (event.key === 'Escape') {
+        closeModal('qrModal');
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+        }
+    }
 });

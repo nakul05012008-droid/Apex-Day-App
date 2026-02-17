@@ -66,7 +66,7 @@
         </button>
     </section>
 
-    <!-- PAYMENT CARD - LIGHT GREEN WITH QR PLACEHOLDER SUPPORT -->
+    <!-- PAYMENT CARD - LIGHT GREEN -->
     <section class="payment-card">
         <h2 class="payment-card-title">
             <i class="fas fa-qrcode"></i>
@@ -76,39 +76,27 @@
             <!-- BLUE QR BOX -->
             <div class="qr-box blue-box">
                 <div class="qr-code-full">
-                    <img src="images/blue_qr.png" alt="Blue Payment QR" id="blueQRImage" class="qr-image-full" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div class=\'qr-placeholder\' onclick=\'showQrPopup(\'blue\')\'><i class=\'fas fa-qrcode\'></i><span>BLUE QR</span><small>tap to scan</small></div>');">
+                    <img src="images/blue_qr.png" alt="Blue Payment QR" id="blueQRImage" class="qr-image-full" onclick="showQRModal('blue')" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div class=\'qr-placeholder\' onclick=\'showQRModal(\'blue\')\'><i class=\'fas fa-qrcode\'></i><span>BLUE QR</span><small>tap to scan</small></div>');">
                 </div>
             </div>
             <!-- YELLOW QR BOX -->
             <div class="qr-box yellow-box">
                 <div class="qr-code-full">
-                    <img src="images/yellow_qr.png" alt="Yellow Payment QR" id="yellowQRImage" class="qr-image-full" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div class=\'qr-placeholder\' onclick=\'showQrPopup(\'yellow\')\'><i class=\'fas fa-qrcode\'></i><span>YELLOW QR</span><small>tap to scan</small></div>');">
+                    <img src="images/yellow_qr.png" alt="Yellow Payment QR" id="yellowQRImage" class="qr-image-full" onclick="showQRModal('yellow')" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div class=\'qr-placeholder\' onclick=\'showQRModal(\'yellow\')\'><i class=\'fas fa-qrcode\'></i><span>YELLOW QR</span><small>tap to scan</small></div>');">
                 </div>
             </div>
         </div>
+        
+        <!-- PAY BUTTONS INSIDE LIGHT GREEN BOARD -->
+        <div class="pay-buttons-inside">
+            <button class="pay-btn blue-pay inside-btn" onclick="showQRModal('blue')">
+                <span class="rupee-symbol">₹</span> PAY FOR BLUE
+            </button>
+            <button class="pay-btn yellow-pay inside-btn" onclick="showQRModal('yellow')">
+                <span class="rupee-symbol">₹</span> PAY FOR YELLOW
+            </button>
+        </div>
     </section>
-
-    <!-- UPI ID SECTION -->
-    <div class="upi-section">
-        <div class="upi-row blue-upi">
-            <span><strong>UPI ID :</strong> 7599181164@ybl</span>
-            <button class="copy-btn" onclick="copyUPI('blue')"><i class="far fa-copy"></i> Copy</button>
-        </div>
-        <div class="upi-row yellow-upi">
-            <span><strong>UPI ID :</strong> 7599181164-2@ybl</span>
-            <button class="copy-btn" onclick="copyUPI('yellow')"><i class="far fa-copy"></i> Copy</button>
-        </div>
-    </div>
-
-    <!-- PAY BUTTONS -->
-    <div class="pay-buttons-section">
-        <a href="upi://pay?pa=7599181164@ybl&pn=APEX%20DAY%20BLUE&cu=INR" class="pay-btn-link" id="bluePayLink">
-            <button class="pay-btn blue-pay"><span class="rupee-symbol">₹</span> PAY FOR BLUE</button>
-        </a>
-        <a href="upi://pay?pa=7599181164-2@ybl&pn=APEX%20DAY%20YELLOW&cu=INR" class="pay-btn-link" id="yellowPayLink">
-            <button class="pay-btn yellow-pay"><span class="rupee-symbol">₹</span> PAY FOR YELLOW</button>
-        </a>
-    </div>
 
     <!-- RULES BUTTON -->
     <section class="rules-button-section">
@@ -126,7 +114,7 @@
         </a>
     </section>
 
-    <!-- FOOTER -->
+    <!-- FOOTER - FULL WIDTH -->
     <footer class="footer">
         <div class="footer-mini">
             <span>© 2024 APEX DAY</span>
@@ -139,7 +127,7 @@
 
     <!-- MODAL -->
     <div id="qrModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" id="modalContent">
             <span class="close-modal" onclick="closeModal('qrModal')">&times;</span>
             <div class="modal-header"><h3 id="modalTitle">QR Code</h3></div>
             <div class="modal-body" id="modalBody"></div>
